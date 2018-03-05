@@ -1,37 +1,59 @@
 # 2018年江苏刑侦推理题
 import random, time
-def judge(answer, n):
-    # 问题一：n小于500吗？已知回答为假
-    if answer[0] is True and n < 500:
-        return False
-    if answer[0] is False and n > 500:
-        return False
-    # 问题二：n是平方数吗？已知回答为假
-    if answer[1] is True and n in arr2:
-        return False
-    if answer[1] is False and n not in arr2:
-        return False
-    # 问题三：n是立方数吗？已知回答为真
-    if answer[2] is True and n not in arr3:
-        return False
-    if answer[2] is False and n in arr3:
-        return False
-    # 问题四：n的倒数第二位数字是1吗？已知回答可能为真也可能为假
-    if answer[3] is True and int(str(n)[-2]) != 1:
-        return False
-    if answer[3] is False and int(str(n)[-2]) == 1:
-        return False
-    return True
-arr2, arr3 = [], []
-[arr2.append(i**2) for i in range(1, 1301) if i**2 >= 13 and i**2 <= 1300]
-[arr3.append(i**3) for i in range(1, 1301) if i**3 >= 13 and i**3 <= 1300]
+# 表达式select[answer]指的是该题自身的答案
+# 表达式inputs[select[answer]]指的是答案中答案（题目）的答案
+def judge(inputs):
+	answer = [int(_) for _ in inputs]
+	select2 = '2301'
+	# 第2题的答案就是第五题的答案
+	if select2[answer[1]] != inputs[4]:
+		return False
+	select3 = '2513'
+	# 第3题的答案里，与剩余的其它三个选项对应题目的案应该不同
+	temp = select3.replace(select3[answer[2]], '')  # 第三题正确选项外的剩余的答案
+	if inputs[int(select3[answer[2]])] in [inputs[int(i)] for i in temp]:
+		return False
+	# 第4题的答案里，对应的两个题目的答案应该相同
+	select4 = [(0, 4), (1, 6), (0, 8), (5, 9)]
+	if inputs[int(select4[answer[3]][0])] != inputs[int(select4[answer[3]][1])]:
+		return False
+	select5 = '7386'
+	# 第5题的案例里，对应的题目的答案应该等于第5题自身的答案
+	if inputs[int(select5[answer[4]])] != inputs[4]:
+		return False
+	select6 = [(1, 3), (0, 5), (2, 9), (4, 8)]
+	# 第6题的案例里，对应的题目的答案应该等于第8题自身的答案
+	if inputs[select6[answer[5]][0]] != inputs[7] or inputs[select6[answer[5]][1]] != inputs[7]:
+		return False
+	select7 = '2103'
+	# 第7题自身的答案，应该等于所有题目里选项最少的答案
+	minAnswerCount = min('0123', key=inputs.count)
+	maxAnswerCount = max('0123', key=inputs.count)
+	if select7[answer[6]] != minAnswerCount:
+		return False
+	select8 = '6419'
+	# 第8题自身的答案，应该和第一题的答案不相邻
+	if abs(int(select8[answer[7]]) - int(inputs[0])) == 1:
+		return False
+	select9 = '5918'
+	# 第9题的答案里，对应的题目的答案与第5题自身的答案相同的真假性为flag
+	flag = inputs[int(select9[answer[8]])] == inputs[4]
+	# flag与第1题和第6题的答案相同为互斥条件
+	if(inputs[0] == inputs[5]) == flag:
+		return False
+	select10 = '3241'
+	# 第10题的答案，应该等于ABDC出现的最多次数-出现的最少次数
+	if (inputs.count(maxAnswerCount) - inputs.count(minAnswerCount)) != int(select10[answer[9]]):
+		return False
+	return True
 if __name__ == "__main__":
-    time_conut, time_start = 0, time.time()
-    while True:
-        time_conut += 1
-        answer = [False, False, True, random.choice([True, False])]
-        n = random.randint(13, 1300)
-        if judge(answer=answer, n=n) is True:
-            print('经过穷举{}次后，对方的回答为：{}，正真的房间号为：{}'.format(time_conut, answer, n))
-            break
-    print('程序消耗时间为：{}'.format(time.time() - time_start))
+	time_conut, time_start = 0, time.time()
+	while True:
+		inputs = ''
+		time_conut += 1
+		for i in range(10):
+			inputs += str(random.choice([0, 1, 2, 3]))
+		if judge(inputs) is True:
+			print('经过穷举{}次后，答案为：{}'.format(time_conut, ''.join([chr(65 + int(i)) for i in inputs])))
+			break
+	print('程序消耗时间为：{}'.format(time.time() - time_start))
