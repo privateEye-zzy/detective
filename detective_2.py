@@ -1,3 +1,4 @@
+# 第十三条大街问题
 import random, time
 def judge(answer, n):
     # 问题一：n小于500吗？已知回答为假
